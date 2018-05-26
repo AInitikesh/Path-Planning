@@ -229,7 +229,6 @@ int main()
 	int available_lanes = 3;
 
 
-
 	h.onMessage([ &map_waypoints_x, &map_waypoints_y, &map_waypoints_s, &map_waypoints_dx, &map_waypoints_dy, &lane, &ref_vel, &available_lanes](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
 																																																														uWS::OpCode opCode) {
 		// "42" at the start of the message means there's a websocket message event.
@@ -283,33 +282,47 @@ int main()
 
 					int lane = getLane(car_d);
 
+
 					bool car_ahead = false;
 					bool car_left = false;
 					bool car_right = false;
+					float speed_ahead = 0.0;
+					float dist_ahead = 10000.0;
 					for(int i =0; i < sensor_fusion.size(); i++)
 					{
-						int id = sensor_fusion[i][0];
 						double vx = sensor_fusion[i][3];
 						double vy = sensor_fusion[i][4];
 						double check_speed = sqrt(vx*vx+vy*vy);
 						double check_car_s = sensor_fusion[i][5];
-						float check_lane = getLane(sensor_fusion[i][6]);
+						int check_lane = getLane(sensor_fusion[i][6]);
 						check_car_s +=((double)prev_size*.02*check_speed); //if using previous points can project s value out
 
 						// check if car ahead
 						if((check_car_s > car_s) && ((check_car_s-car_s) < 30) && check_lane == lane)
 						{
-							car_ahead = true;
+							float current_dist = check_car_s - car_s;
+							if(dist_ahead > current_dist){
+								speed_ahead = check_speed;
+								dist_ahead = current_dist;
+							}
+							car_ahead = true;	
 						}
 
 						//check left
-						if((abs(check_car_s-car_s) < 5) && lane - 1 == check_lane){
-							car_left = true;
+						if( lane - 1 == check_lane)
+						{
+							if ( (check_car_s >car_s && check_car_s-car_s < 35) || (check_car_s < car_s && car_s-check_car_s < 5)) {
+								car_left = true;
+							}
 						}
 
 						//check Right
-						if((abs(check_car_s-car_s) < 5) && lane + 1 == check_lane){
-							car_right = true;
+						if( lane + 1 == check_lane)
+						{
+							
+							if( (check_car_s >car_s && check_car_s-car_s < 35) || (check_car_s < car_s && car_s-check_car_s < 5)){
+								car_right = true;
+							}	
 						}
 
 					}
@@ -321,7 +334,8 @@ int main()
 						} else if(!car_right && lane + 1 < available_lanes){
 							lane++;
 						}
-						ref_vel -= 0.224;
+						float new_velocity = ref_vel - 0.224;
+						ref_vel = max(new_velocity, speed_ahead);
 					}
 					else if(ref_vel < 49.5) {
 						ref_vel += 0.224;
