@@ -135,6 +135,37 @@ that's just a guess.
 One last note here: regardless of the IDE used, every submitted project must
 still be compilable with cmake and make./
 
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
+ ## Project Specification
+
+ Following are the tasks performed on the stimulator to drive the vehicles smootly. I was able to drive the vehicle 10 miles without any incident. 
+
+[Video](https://youtu.be/ezqYuWRxPPk)
+
+### Identify vehicles around
+
+Using sensor fusion the cars around are captured from which we get the s, d and (vx, vy). Line [167-182](https://github.com/AInitikesh/Path-Planning/blob/f921ff3973f5a6b54f9fda41b350c9e18b01b56b/src/main.cpp#L167) is used to calculate the lane from the value of d. From vx,vy we can calculate the speed of the vehicles around. 
+
+For checking the lane change conditions car the should know following using the s, d values of the cars around
+* If there is a car ahead within 30m.
+  * what is the speed of the car ahead.  
+* If there is car on left 35m ahead or 10m behind
+* If there is car on right 35m ahead or 10m behind
+
+Code lines [286-328](https://github.com/AInitikesh/Path-Planning/blob/f921ff3973f5a6b54f9fda41b350c9e18b01b56b/src/main.cpp#L286) shows the above functionality.
+
+## Calculate the lane and velocity of the vehicles around
+
+Using the information of the cars around our car can perform
+* acceleration
+* deceleration
+* lane change left
+* lane change right
+
+Lines [330-342](https://github.com/AInitikesh/Path-Planning/blob/f921ff3973f5a6b54f9fda41b350c9e18b01b56b/src/main.cpp#L330) contains the logic code for calulating the velocity of vehicle and the lane. 
+
+## Generating the trajectory
+
+First, we push the remaining points from the earlier generated trajectory reference. Then we need to generate 3 points 30m ahead based on the lane and velocity of the vehicle. Lines [347-398](https://github.com/AInitikesh/Path-Planning/blob/f921ff3973f5a6b54f9fda41b350c9e18b01b56b/src/main.cpp#L347) shows the same.
+
+Using Spline library a smooth trajectory of 50 points is generated in [412-457](https://github.com/AInitikesh/Path-Planning/blob/f921ff3973f5a6b54f9fda41b350c9e18b01b56b/src/main.cpp#L412). This genearted trajectory points are converted to x, y coordinates and then passed to the stimulator for driving the vehicle. 
 
