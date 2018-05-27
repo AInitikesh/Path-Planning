@@ -311,7 +311,7 @@ int main()
 						//check left
 						if( lane - 1 == check_lane)
 						{
-							if ( (check_car_s >car_s && check_car_s-car_s < 35) || (check_car_s < car_s && car_s-check_car_s < 5)) {
+							if ( (check_car_s >car_s && check_car_s-car_s < 35) || (check_car_s < car_s && car_s-check_car_s < 10)) {
 								car_left = true;
 							}
 						}
@@ -320,7 +320,7 @@ int main()
 						if( lane + 1 == check_lane)
 						{
 							
-							if( (check_car_s >car_s && check_car_s-car_s < 35) || (check_car_s < car_s && car_s-check_car_s < 5)){
+							if( (check_car_s >car_s && check_car_s-car_s < 35) || (check_car_s < car_s && car_s-check_car_s < 10)){
 								car_right = true;
 							}	
 						}
